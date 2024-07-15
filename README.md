@@ -8,6 +8,12 @@
 brew install git-lfs
 ```
 
+2.
+
+```bash
+git lfs install
+```
+
 ## Local
 
 1. Install Packages
