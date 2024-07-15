@@ -1,5 +1,13 @@
 # Documentation
 
+## Pulling Repo
+
+1.
+
+```bash
+brew install git-lfs
+```
+
 ## Local
 
 1. Install Packages
