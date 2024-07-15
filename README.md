@@ -29,3 +29,17 @@ pip3 install -r requirements.txt
 ```bash
 fastapi dev app.py
 ```
+
+## Docker
+
+Build Image
+
+```bash
+docker build -t pixolve-backend .
+```
+
+Run Docker Container
+
+```bash
+docker run -p 8000:8000 pixolve-backend
+```
