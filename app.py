@@ -1,5 +1,4 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 import onnxruntime as ort
 from PIL import Image
@@ -9,6 +8,8 @@ from mangum import Mangum
 
 app = FastAPI()
 handler = Mangum(app)
+
+model_path = './model.onnx'
 
 
 def load_model(model_path):
@@ -33,8 +34,6 @@ def image_to_bytes(image_tensor):
     image.save(byte_arr, format='PNG')
     byte_arr.seek(0)
     return byte_arr
-
-model_path = './model.onnx'
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):

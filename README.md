@@ -1,11 +1,11 @@
----
-title: Enhance
-emoji: 👁
-colorFrom: yellow
-colorTo: indigo
-sdk: docker
-pinned: false
-license: apache-2.0
----
+# Documentation
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+## Local
+
+1. Install Packages
+
+```bash
+pip3 install -r requirements.txt
+```
+
+2. Run Development Server
