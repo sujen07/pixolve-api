@@ -1,0 +1,6 @@
+onnxruntime
+numpy
+Pillow==10.1.0
+fastapi
+mangum
+uvicorn
