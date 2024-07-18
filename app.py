@@ -8,6 +8,10 @@ import numpy as np
 import onnxruntime as ort
 from PIL import Image
 from typing import Dict
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 handler = Mangum(app)
@@ -51,12 +55,15 @@ def image_to_bytes(image_tensor):
     return byte_arr
 
 def verify_jwt(credentials: HTTPAuthorizationCredentials = Depends(security)) -> Dict:
-    try:
-        token = credentials.credentials
-        payload = jwt.decode(token, CLERK_JWT_PUBLIC_KEY, algorithms=["RS256"])
-        return payload
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    if os.getenv("ENVIRONMENT") == "development":
+        return {}
+    else:
+        try:
+            token = credentials.credentials
+            payload = jwt.decode(token, CLERK_JWT_PUBLIC_KEY, algorithms=["RS256"])
+            return payload
+        except JWTError:
+            raise HTTPException(status_code=401, detail="Invalid token")
 
 @app.post("/predict")
 async def predict(
@@ -67,15 +74,12 @@ async def predict(
         img = Image.open(file.file).convert('RGB')
         input_tensor = prepare_image(img)
         
-        # Load model, run inference, and unload model
         model_session = load_model(model_path)
         output_tensor = run_inference(model_session, input_tensor)
         del model_session
 
         output_image = image_to_bytes(output_tensor)
         return StreamingResponse(output_image, media_type="image/png")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
