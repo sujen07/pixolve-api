@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -6,10 +7,9 @@ from jose import JWTError, jwt
 from mangum import Mangum
 import numpy as np
 import onnxruntime as ort
+import os
 from PIL import Image
 from typing import Dict
-import os
-from dotenv import load_dotenv
 
 load_dotenv()
 

@@ -5,3 +5,4 @@ fastapi
 mangum
 uvicorn
 python-jose
+python-dotenv
