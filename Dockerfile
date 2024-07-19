@@ -1,15 +1,17 @@
-FROM public.ecr.aws/lambda/python:3.12
+# Use an official Python runtime as a parent image
+FROM python:3.12-slim
 
-COPY model.onnx model.onnx
+# Set the working directory in the container
+WORKDIR /app
 
-# Copy requirements.txt
-COPY requirements.txt ${LAMBDA_TASK_ROOT}
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-# Install the specified packages
-RUN pip install -r requirements.txt
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy function code
-COPY app.py ${LAMBDA_TASK_ROOT}
+# Make port 8000 available to the world outside this container
+EXPOSE 8000
 
-# Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
-CMD [ "app.handler" ]
+# Run app.py when the container launches
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

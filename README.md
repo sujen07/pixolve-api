@@ -1,11 +1,45 @@
----
-title: Enhance
-emoji: 👁
-colorFrom: yellow
-colorTo: indigo
-sdk: docker
-pinned: false
-license: apache-2.0
----
+# Documentation
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+## Pulling Repo
+
+1. Install git lfs for large files
+
+```bash
+brew install git-lfs
+```
+
+2. Add lfs to git
+
+```bash
+git lfs install
+```
+
+3. Clone the git repo
+
+## Local
+
+1. Install Packages
+
+```bash
+pip3 install -r requirements.txt
+```
+
+2. Run Development Server
+
+```bash
+fastapi dev app.py
+```
+
+## Docker
+
+Build Image
+
+```bash
+docker build -t pixolve-backend .
+```
+
+Run Docker Container
+
+```bash
+docker run -p 8000:8000 pixolve-backend
+```
