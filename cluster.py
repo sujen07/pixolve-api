@@ -6,9 +6,9 @@ import time
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
 from concurrent.futures import ThreadPoolExecutor
-from sklearn.manifold import TSNE
-import matplotlib.pyplot as plt
-from scipy.spatial.distance import euclidean
+#from sklearn.manifold import TSNE
+#import matplotlib.pyplot as plt
+#from scipy.spatial.distance import euclidean
 
 # Constants
 EPS = 20
@@ -73,14 +73,15 @@ def get_images_from_folder(folder_path, max_images=50, num_threads=4):
     
     return list(image_paths), list(images)
 
+"""
 def plot_clusters(features_tsne, clusters):
-    """Plot the TSNE clusters."""
+    # Plot the TSNE clusters.
     plt.scatter(features_tsne[:,0], features_tsne[:,1], c=clusters)
     plt.colorbar()
     plt.savefig('clusters.png')
 
 def calculate_image_distance(image_path1, image_path2, scaler):
-    """Calculate the Euclidean distance between two images."""
+    # Calculate the Euclidean distance between two images.
     model = load_model()
 
     img1 = Image.open(image_path1).convert('RGB')
@@ -95,6 +96,7 @@ def calculate_image_distance(image_path1, image_path2, scaler):
 
     distance = euclidean(features1, features2)
     return distance
+"""
 
 
 def main(folder_path):
