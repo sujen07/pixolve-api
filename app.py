@@ -10,6 +10,10 @@ import onnxruntime as ort
 import os
 from PIL import Image
 from typing import Dict
+import zipfile
+import cluster
+import time
+
 
 load_dotenv()
 
@@ -65,7 +69,7 @@ def verify_jwt(credentials: HTTPAuthorizationCredentials = Depends(security)) ->
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-@app.post("/predict")
+@app.post("/enhance")
 async def predict(
     file: UploadFile = File(...),
     payload: Dict = Depends(verify_jwt)
@@ -83,3 +87,47 @@ async def predict(
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/cluster")
+async def cluster_post(
+    file: UploadFile = File(...),
+    payload: Dict = Depends(verify_jwt)
+):
+    print('test')
+    
+    file_content = await file.read()
+    
+    # Create a BytesIO object
+    zip_bytes = io.BytesIO(file_content)
+    
+    # Create a temporary directory to extract files
+    temp_dir = "temp_extracted"
+    os.makedirs(temp_dir, exist_ok=True)
+    
+    try:
+        with zipfile.ZipFile(zip_bytes, 'r') as zip_ref:
+            zip_ref.extractall(temp_dir)
+        
+        # Process the extracted files here
+        extracted_files = os.listdir(temp_dir)
+        
+        start_time = time.time()
+        clusters = cluster.main(temp_dir)
+        print(clusters)
+        end_time = time.time()
+        print('Time taken for clusters: ', (end_time - start_time))
+
+        return {"message": f"ZIP file extracted successfully. Files: {extracted_files}"}
+
+    except zipfile.BadZipFile:
+        raise HTTPException(status_code=400, detail="Invalid ZIP file")
+
+    finally:
+        # Clean up: remove the temporary directory and its contents
+        for root, dirs, files in os.walk(temp_dir, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
+        os.rmdir(temp_dir)
+        
