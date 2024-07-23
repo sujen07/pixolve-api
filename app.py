@@ -12,6 +12,7 @@ from PIL import Image
 from typing import Dict
 import zipfile
 import cluster
+import scoring
 import time
 
 
@@ -58,6 +59,13 @@ def image_to_bytes(image_tensor):
     byte_arr.seek(0)
     return byte_arr
 
+def score_each_cluster(clusters):
+    for cluster in clusters:
+        scores = scoring.main(clusters[cluster])
+        clusters[cluster] = scores
+    return clusters
+
+
 def verify_jwt(credentials: HTTPAuthorizationCredentials = Depends(security)) -> Dict:
     if os.getenv("ENVIRONMENT") == "development":
         return {}
@@ -93,7 +101,6 @@ async def cluster_post(
     file: UploadFile = File(...),
     payload: Dict = Depends(verify_jwt)
 ):
-    print('test')
     
     file_content = await file.read()
     
@@ -113,6 +120,8 @@ async def cluster_post(
         
         start_time = time.time()
         clusters = cluster.main(temp_dir)
+        print(clusters)
+        clusters = score_each_cluster(clusters)
         print(clusters)
         end_time = time.time()
         print('Time taken for clusters: ', (end_time - start_time))
