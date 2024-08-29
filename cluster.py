@@ -111,13 +111,11 @@ def main(folder_path):
         raise Exception("No Images in folder found")
 
     end_time = time.time()
-    print('getting images time: ', (end_time - start_time))
 
     # Extract features
     start_time = time.time()
     features = extract_features(ort_session, images)
     end_time = time.time()
-    print('resnet time: ', (end_time - start_time))
     features = scaler.fit_transform(features)
 
 
@@ -126,7 +124,6 @@ def main(folder_path):
     dbscan = DBSCAN(eps=EPS, min_samples=1)
     clusters = dbscan.fit_predict(features)
     end_time = time.time()
-    print('clustering time: ', (end_time - start_time))
 
     # Evaluate clusters with scatterplot
     """
@@ -141,7 +138,6 @@ def main(folder_path):
     for idx, cluster in enumerate(clusters):
         cluster_images[cluster].append(paths[idx])
     end_time = time.time()
-    print('make cluster object time: ', (end_time - start_time))
     return cluster_images
 
 
@@ -149,4 +145,3 @@ def main(folder_path):
 if __name__ == "__main__":
      folder_path = 'album_images'
      cluster_imgs = main(folder_path)
-     print(cluster_imgs)

@@ -118,13 +118,8 @@ async def cluster_post(
         # Process the extracted files here
         extracted_files = os.listdir(temp_dir)
         
-        start_time = time.time()
         clusters = cluster.main(temp_dir)
-        print(clusters)
         clusters = score_each_cluster(clusters)
-        print(clusters)
-        end_time = time.time()
-        print('Time taken for clusters: ', (end_time - start_time))
 
         return {"message": f"ZIP file extracted successfully. Files: {extracted_files}"}
 
