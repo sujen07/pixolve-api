@@ -59,9 +59,9 @@ def extract_features(ort_session, images):
         features.append(ort_outs[0].flatten())
     return np.array(features)
 
-def get_images_from_folder(folder_path, max_images=50, num_threads=4):
+def get_images_from_folder(folder_path, num_threads=4):
     """Load images from the specified folder using multi-threading."""
-    image_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path)[:max_images]
+    image_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path)
                    if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
     
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
@@ -108,7 +108,8 @@ def main(folder_path):
     start_time = time.time()
     paths, images = get_images_from_folder(folder_path)
     if len(images) == 0:
-        return None
+        raise Exception("No Images in folder found")
+
     end_time = time.time()
     print('getting images time: ', (end_time - start_time))
 
