@@ -232,7 +232,7 @@ def main(img_filenames):
 
         b_score = blur_score(img)
         brightness_score, contrast_score = lighting_score(img)
-        print(e_score)
+
 
         if len(faces) < max_faces:
             e_score -= len(faces) / max_faces
