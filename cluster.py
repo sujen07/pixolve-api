@@ -89,7 +89,7 @@ def main(folder_path):
     clusters = adaptive_dbscan(features)
 
     # Group images by clusters
-    cluster_images = {i: [] for i in set(clusters)}
+    cluster_images = {int(i): [] for i in set(clusters)}
     for idx, cluster in enumerate(clusters):
         cluster_images[cluster].append(paths[idx])
 
