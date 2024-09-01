@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import io
@@ -19,6 +20,19 @@ import time
 load_dotenv()
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 handler = Mangum(app)
 security = HTTPBearer()
 
@@ -115,13 +129,11 @@ async def cluster_post(
         with zipfile.ZipFile(zip_bytes, 'r') as zip_ref:
             zip_ref.extractall(temp_dir)
         
-        # Process the extracted files here
-        extracted_files = os.listdir(temp_dir)
         
         clusters = cluster.main(temp_dir)
         clusters = score_each_cluster(clusters)
 
-        return {"message": f"ZIP file extracted successfully. Files: {extracted_files}"}
+        return clusters
 
     except zipfile.BadZipFile:
         raise HTTPException(status_code=400, detail="Invalid ZIP file")

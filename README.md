@@ -14,7 +14,11 @@ brew install git-lfs
 git lfs install
 ```
 
-3. Clone the git repo
+3. Pull lfs
+
+```bash
+git lfs pull
+```
 
 ## Local
 
