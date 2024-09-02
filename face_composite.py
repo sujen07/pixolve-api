@@ -14,12 +14,6 @@ def get_landmarks(image):
     landmarks = predictor(gray, faces[0])
     return np.array([(p.x, p.y) for p in landmarks.parts()])
 
-def get_harris_corners(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    harris_corners = cv2.cornerHarris(gray, 2, 3, 0.04)
-    keypoints = np.argwhere(harris_corners > 0.01 * harris_corners.max())
-    return keypoints[:, [1, 0]]  # convert to (x, y) format
-
 def create_focus_mask(landmarks, image_shape):
     mask = np.zeros(image_shape[:2], dtype=np.uint8)
     indices = {
@@ -34,27 +28,30 @@ def merge_faces(source_image, target_image_full, face_location):
     left, top, right, bottom = face_location
     target_image = target_image_full[top:bottom, left:right]
 
-    # Get landmarks and corners
+    # Get landmarks
     source_landmarks = get_landmarks(source_image)
     target_landmarks = get_landmarks(target_image)
-    source_corners = get_harris_corners(source_image)
-    target_corners = get_harris_corners(target_image)
 
-    # Combine landmarks and corners
-    source_points = np.vstack((source_landmarks, source_corners))
-    target_points = np.vstack((target_landmarks, target_corners))
+    if source_landmarks is None or target_landmarks is None:
+        print("Could not detect landmarks in one of the images.")
+        return target_image_full
 
-    min_length = min(len(source_points), len(target_points))
-    source_points = source_points[:min_length]
-    target_points = target_points[:min_length]
+    # Use only the main facial features for alignment
+    selected_points = list(range(36, 48)) + list(range(30, 36))  # Eyes + Nose
 
-    # Compute and apply the similarity transform
+    source_points = source_landmarks[selected_points]
+    target_points = target_landmarks[selected_points]
+
+    # Compute and apply the affine transform
     M, _ = cv2.estimateAffinePartial2D(source_points, target_points, method=cv2.RANSAC)
     if M is None:
         print("Similarity transform could not be computed.")
         return target_image_full
 
     aligned_image = cv2.warpAffine(source_image, M, (target_image.shape[1], target_image.shape[0]))
+
+    # Clip the aligned face to the target face region
+    aligned_image = cv2.bitwise_and(aligned_image, aligned_image, mask=create_focus_mask(target_landmarks, target_image.shape))
 
     # Color correction
     mean_source = cv2.mean(aligned_image)[:3]

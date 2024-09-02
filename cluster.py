@@ -74,7 +74,7 @@ def adaptive_dbscan(features, min_samples=2):
     return clusters
 
 
-def main(folder_path):
+def main(folder_path, min_samples=2):
     ort_session = load_model()
     scaler = StandardScaler()
 
@@ -86,7 +86,7 @@ def main(folder_path):
     #features = scaler.fit_transform(features)
 
     # Use adaptive DBSCAN
-    clusters = adaptive_dbscan(features)
+    clusters = adaptive_dbscan(features, min_samples)
 
     # Group images by clusters
     cluster_images = {int(i): [] for i in set(clusters)}

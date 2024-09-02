@@ -6,6 +6,7 @@ import dlib
 from collections import defaultdict
 import numpy as np
 import face_composite
+import pdb
 
 detector = dlib.get_frontal_face_detector()
 recognizer = dlib.face_recognition_model_v1("dlib_face_recognition_resnet_model_v1.dat")
@@ -30,7 +31,7 @@ def is_same_face(known_faces, face_encoding):
 
 def create_composite_score(scores):
     max_scores = {
-        'eye_score' : 0,
+        'eyes_score' : 0,
         'smile_score' : 0,
         'blur_score' : 0,
         'brightness_score' : 0,
@@ -45,7 +46,7 @@ def create_composite_score(scores):
         composite_score = 0
         for type in max_scores:
             score[type] /= max(max_scores[type], 0.0001)
-            composite_score += score[type]
+            composite_score += score[type] * scoring.COEF_MAPPING[type]
         scores[i] = composite_score
         if composite_score > best_score[1]:
             best_score[1] = composite_score
@@ -84,7 +85,7 @@ def create_face_dicts(images):
             # Get all the scores for the face
             brightness_score, contrast_score = scoring.lighting_score(face_image)
             scores = {
-                'eye_score' : scoring.eyes_open_score(image, [face], gray),
+                'eyes_score' : scoring.eyes_open_score(image, [face], gray),
                 'smile_score' : scoring.smile_score(image, [face], gray),
                 'blur_score' : scoring.blur_score(face_image),
                 'brightness_score' : brightness_score,
@@ -101,14 +102,14 @@ def create_face_dicts(images):
         scores = face_dict[face]['scores']
         best_face = create_composite_score(scores)
         face_dict[face]['best_face_ind'] = best_face
-        del face_dict[face]['scores']
+        #del face_dict[face]['scores']
 
     return face_dict
 
 
 
 def main(folder_path):
-    cluster_imgs = cluster.main(folder_path)
+    cluster_imgs = cluster.main(folder_path, min_samples=len(os.listdir(folder_path)))
     if len(cluster_imgs) > 1:
         raise Exception("Images are not similar enough to merge!")
     
@@ -134,8 +135,9 @@ def main(folder_path):
             
     
 
-
+    #pdb.set_trace()
     for face in face_dict:
+        print(face)
         locations = face_dict[face]['locations'][target_ind][1]
         best_ind = face_dict[face]['best_face_ind']
         x1, y1, x2, y2 = face_dict[face]['locations'][best_ind][1]
@@ -148,4 +150,4 @@ def main(folder_path):
 
 
 if __name__ == '__main__':
-    main('test')
+    target_image = main('test')
