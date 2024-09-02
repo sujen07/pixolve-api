@@ -29,6 +29,61 @@ def is_same_face(known_faces, face_encoding):
             return idx
     return -1
 
+def filter_main_subjects(image, faces):
+    height, width = image.shape[:2]
+    image_area = height * width
+    
+    filtered_faces = []
+    face_areas = []
+    
+    # Calculate face areas and store them
+    for face in faces:
+        face_width = face.right() - face.left()
+        face_height = face.bottom() - face.top()
+        face_area = face_width * face_height
+        face_areas.append(face_area)
+    
+    if len(faces) == 0:
+        return []
+    
+    # Calculate statistics
+    max_area = max(face_areas)
+    avg_area = sum(face_areas) / len(face_areas)
+    
+    for i, face in enumerate(faces):
+        face_area = face_areas[i]
+        
+        # Criteria for keeping a face:
+        # 1. If it's the largest face
+        # 2. If it's at least 50% of the largest face's size
+        # 3. If it's larger than the average face size
+        # 4. If it takes up more than 1% of the image (adjust as needed)
+        if (face_area == max_area or 
+            face_area >= 0.5 * max_area or 
+            face_area > avg_area or 
+            face_area / image_area > 0.1):
+            filtered_faces.append(face)
+    
+    return filtered_faces
+
+def clip_to_image(x, y, w, h, image_width, image_height):
+    """
+    Clip the face bounding box coordinates to be within the image boundaries.
+    
+    Parameters:
+    x, y: Top-left corner coordinates of the face bounding box
+    w, h: Width and height of the face bounding box
+    image_width, image_height: Dimensions of the main image
+    
+    Returns:
+    Tuple of clipped (x1, y1, x2, y2) coordinates
+    """
+    x1 = max(0, min(x, image_width - 1))
+    y1 = max(0, min(y, image_height - 1))
+    x2 = max(0, min(x + w, image_width))
+    y2 = max(0, min(y + h, image_height))
+    return x1, y1, x2, y2
+
 def create_composite_score(scores):
     max_scores = {
         'eyes_score' : 0,
@@ -63,8 +118,12 @@ def create_face_dicts(images):
     for filename, image in images:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # Convert to grayscale for faster processing
         faces = detector(gray, 1)  # Detect faces in the image
+        faces = filter_main_subjects(image, faces)
+        image_height, image_width = image.shape[:2]
 
         for face in faces:
+            print('file: ', filename)
+            print(face)
             shape = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")(gray, face)
             face_encoding = np.array(recognizer.compute_face_descriptor(image, shape))
 
@@ -80,6 +139,9 @@ def create_face_dicts(images):
 
             x1, y1 = face.left(), face.top()
             x2, y2 = face.right(), face.bottom()
+
+            x1, y1, x2, y2 = clip_to_image(x1, y1, x2 - x1, y2 - y1, image_width, image_height)
+
             face_image = image[y1:y2, x1:x2]
 
             # Get all the scores for the face
@@ -137,7 +199,8 @@ def main(folder_path):
 
     #pdb.set_trace()
     for face in face_dict:
-        print(face)
+        if len(face_dict[face]['locations']) != len(images):
+            continue
         locations = face_dict[face]['locations'][target_ind][1]
         best_ind = face_dict[face]['best_face_ind']
         x1, y1, x2, y2 = face_dict[face]['locations'][best_ind][1]
@@ -151,3 +214,4 @@ def main(folder_path):
 
 if __name__ == '__main__':
     target_image = main('test')
+    cv2.imwrite('test1.jpg', cv2.cvtColor(target_image, cv2.COLOR_BGR2RGB))
