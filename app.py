@@ -74,7 +74,10 @@ def image_to_bytes(arr):
 
 def score_each_cluster(clusters):
     for cluster in clusters:
-        scores = scoring.main(clusters[cluster])
+        if cluster == -1:
+            scores = {filename:0 for filename in clusters[cluster]}
+        else:
+            scores = scoring.main(clusters[cluster])
         clusters[cluster] = scores
     return clusters
 
