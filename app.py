@@ -15,6 +15,7 @@ import zipfile
 import cluster
 import scoring
 import time
+import merge
 
 
 load_dotenv()
@@ -64,9 +65,7 @@ def run_inference(session, input_tensor):
     output = session.run(None, {input_name: input_tensor})
     return output[0]
 
-def image_to_bytes(image_tensor):
-    arr = np.clip(image_tensor.squeeze(0), 0, 1).transpose(1, 2, 0)
-    arr = (arr * 255).astype(np.uint8)
+def image_to_bytes(arr):
     image = Image.fromarray(arr)
     byte_arr = io.BytesIO()
     image.save(byte_arr, format='PNG')
@@ -104,7 +103,10 @@ async def predict(
         output_tensor = run_inference(model_session, input_tensor)
         del model_session
 
-        output_image = image_to_bytes(output_tensor)
+        arr = np.clip(output_tensor.squeeze(0), 0, 1).transpose(1, 2, 0)
+        arr = (arr * 255).astype(np.uint8)
+        output_image = image_to_bytes(arr)
+
         return StreamingResponse(output_image, media_type="image/png")
     except Exception as e:
         print(e)
@@ -134,6 +136,44 @@ async def cluster_post(
         clusters = score_each_cluster(clusters)
 
         return clusters
+
+    except zipfile.BadZipFile:
+        raise HTTPException(status_code=400, detail="Invalid ZIP file")
+
+    finally:
+        # Clean up: remove the temporary directory and its contents
+        for root, dirs, files in os.walk(temp_dir, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
+        os.rmdir(temp_dir)
+
+
+@app.post("/merge")
+async def cluster_post(
+    file: UploadFile = File(...),
+    payload: Dict = Depends(verify_jwt)
+):
+    
+    file_content = await file.read()
+    
+    # Create a BytesIO object
+    zip_bytes = io.BytesIO(file_content)
+    
+    # Create a temporary directory to extract files
+    temp_dir = "temp_extracted"
+    os.makedirs(temp_dir, exist_ok=True)
+    
+    try:
+        with zipfile.ZipFile(zip_bytes, 'r') as zip_ref:
+            zip_ref.extractall(temp_dir)
+        
+        
+        final_image = merge.main(temp_dir)
+
+        output_image = image_to_bytes(final_image)
+        return StreamingResponse(output_image, media_type="image/png")
 
     except zipfile.BadZipFile:
         raise HTTPException(status_code=400, detail="Invalid ZIP file")
