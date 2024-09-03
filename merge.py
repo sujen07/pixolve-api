@@ -171,10 +171,9 @@ def create_face_dicts(images):
 
 
 def main(folder_path):
-    min_samples = round((len(os.listdir(folder_path))/4)*3)
-    cluster_imgs = cluster.main(folder_path, min_samples=min_samples)
+    cluster_imgs = cluster.main(folder_path, min_samples=2)
     if len(cluster_imgs) > 1:
-        raise Exception("Images are not similar enough to merge!")
+        return None
     
     del cluster_imgs
 

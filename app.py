@@ -182,6 +182,8 @@ async def cluster_post(
         
         
         final_image = merge.main(temp_dir)
+        if not final_image:
+            raise HTTPException(status_code=500, detail="Images are too similar to merge!")
 
         output_image = image_to_bytes(final_image)
         return StreamingResponse(output_image, media_type="image/png")
