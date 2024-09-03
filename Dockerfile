@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12
 
 # Set working directory
 WORKDIR /app
@@ -8,11 +8,24 @@ COPY . /app
 
 # Install system dependencies
 RUN apt-get update && \
-    apt-get install -y cmake libboost-all-dev g++ && \
-    apt-get clean
+    apt-get install -y \
+    cmake \
+    libboost-all-dev \
+    g++ \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libx11-6 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+
+# Set environment variable for OpenCV
+ENV OPENCV_VIDEOIO_PRIORITY_MSMF=0
 
 # Command to run the application (replace with your actual command)
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["fastapi", "run", "/app/app.py", "--port", "8000"]
