@@ -15,4 +15,4 @@ RUN apt-get update && \
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Command to run the application (replace with your actual command)
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
