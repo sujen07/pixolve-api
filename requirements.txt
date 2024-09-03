@@ -9,3 +9,4 @@ python-dotenv
 scikit-learn
 opencv-python
 dlib
+scikit-image

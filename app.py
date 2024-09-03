@@ -16,6 +16,7 @@ import cluster
 import scoring
 import time
 import merge
+from rate_limiter import rate_limiter
 
 
 load_dotenv()
@@ -84,7 +85,7 @@ def score_each_cluster(clusters):
 
 def verify_jwt(credentials: HTTPAuthorizationCredentials = Depends(security)) -> Dict:
     if os.getenv("ENVIRONMENT") == "development":
-        return {}
+        return {"sub": "dev_user"}
     else:
         try:
             token = credentials.credentials
@@ -93,10 +94,17 @@ def verify_jwt(credentials: HTTPAuthorizationCredentials = Depends(security)) ->
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid token")
 
+def rate_limit(payload: Dict = Depends(verify_jwt)):
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID not found in token")
+    rate_limiter.check_rate_limit(user_id)
+    return payload
+
 @app.post("/enhance")
 async def predict(
     file: UploadFile = File(...),
-    payload: Dict = Depends(verify_jwt)
+    payload: Dict = Depends(rate_limit)
 ):
     try:        
         img = Image.open(file.file).convert('RGB')
@@ -118,7 +126,7 @@ async def predict(
 @app.post("/cluster")
 async def cluster_post(
     file: UploadFile = File(...),
-    payload: Dict = Depends(verify_jwt)
+    payload: Dict = Depends(rate_limit)
 ):
     
     file_content = await file.read()
@@ -156,7 +164,7 @@ async def cluster_post(
 @app.post("/merge")
 async def cluster_post(
     file: UploadFile = File(...),
-    payload: Dict = Depends(verify_jwt)
+    payload: Dict = Depends(rate_limit)
 ):
     
     file_content = await file.read()

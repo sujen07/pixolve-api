@@ -100,4 +100,3 @@ def main(folder_path, min_samples=2):
 if __name__ == "__main__":
     folder_path = 'test'
     cluster_imgs = main(folder_path)
-    print(cluster_imgs)
