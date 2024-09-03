@@ -83,7 +83,7 @@ def main(folder_path, min_samples=2):
         raise Exception("No images found in folder")
 
     features = extract_features(ort_session, images)
-    #features = scaler.fit_transform(features)
+    features = scaler.fit_transform(features)
 
     # Use adaptive DBSCAN
     clusters = adaptive_dbscan(features, min_samples)
