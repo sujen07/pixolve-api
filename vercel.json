@@ -5,7 +5,8 @@
       "src": "app.py",
       "use": "@vercel/python",
       "config": {
-        "buildCommand": "apt-get update && apt-get install -y cmake && pip install -r requirements.txt"
+        "prebuild": "apt-get update && apt-get install -y cmake",
+        "installCommand": "pip install -r requirements.txt"
       }
     }
   ],
