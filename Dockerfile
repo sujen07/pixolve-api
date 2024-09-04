@@ -1,7 +1,13 @@
-FROM public.ecr.aws/lambda/python:3.10
-# Copy function code
-COPY . ${LAMBDA_TASK_ROOT}
+FROM python:3.12
 
-RUN pip3 install -r requirements.txt - target "${LAMBDA_TASK_ROOT}" -U - no-cache-dir
-# Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
-CMD [ "app.handler" ]
+# Set working directory
+WORKDIR /app
+
+# Copy all files to the container
+COPY . /app
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Command to run the application (replace with your actual command)
+CMD ["fastapi", "run", "app.py", "--port", "8000"]

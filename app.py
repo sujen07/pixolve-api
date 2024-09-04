@@ -17,7 +17,6 @@ import scoring
 import time
 import merge
 from rate_limiter import rate_limiter
-import uvicorn
 
 
 load_dotenv()
@@ -104,6 +103,10 @@ def rate_limit(payload: Dict = Depends(verify_jwt)):
     rate_limiter.check_rate_limit(user_id)
     return payload
 
+@app.get("/")
+def read_root():
+   return {"Welcome to": "My first FastAPI depolyment using Docker image"}
+
 @app.post("/enhance")
 async def predict(
     file: UploadFile = File(...),
@@ -163,7 +166,6 @@ async def cluster_post(
                 os.rmdir(os.path.join(root, name))
         os.rmdir(temp_dir)
 
-
 @app.post("/merge")
 async def cluster_post(
     file: UploadFile = File(...),
@@ -202,6 +204,3 @@ async def cluster_post(
             for name in dirs:
                 os.rmdir(os.path.join(root, name))
         os.rmdir(temp_dir)
-
-if __name__ == "__main__":
-   uvicorn.run(app, host="0.0.0.0", port=8000)
