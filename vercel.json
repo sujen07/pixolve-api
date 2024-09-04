@@ -6,6 +6,15 @@
       "use": "@vercel/python"
     }
   ],
+  "build": {
+    "env": {
+      "CMAKE_GENERATOR": "Unix Makefiles"
+    },
+    "commands": [
+      "apt-get update && apt-get install -y cmake",
+      "pip install -r requirements.txt"
+    ]
+  },
   "routes": [
     {
       "src": "/(.*)",
