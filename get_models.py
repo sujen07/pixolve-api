@@ -1,32 +1,38 @@
-import os
 import requests
+import bz2
+import os
 
-# Google Drive file IDs
-file_ids = {
-    'shape_predictor_68_face_landmarks.dat': '1ezlZygd4SQpQq-N4VgCk7rXA8Sp9L3p0',
-    'dlib_face_recognition_resnet_model_v1.dat': '1eM58gYNu1xRmf5bBySQwYO-sWPwc0AE7'
+def download_file(url, filename):
+    # Check if the file already exists and delete it
+    if os.path.exists(filename + '.bz2'):
+        os.remove(filename + '.bz2')
+        print(f"Removed existing {filename}.bz2")
+    
+    # Download the file
+    response = requests.get(url)
+    with open(filename + '.bz2', 'wb') as file:
+        file.write(response.content)
+    print(f"Downloaded {filename}.bz2")
+
+def decompress_bz2(file_path):
+    # Check if the decompressed file already exists and delete it
+    if os.path.exists(file_path[:-4]):
+        os.remove(file_path[:-4])
+        print(f"Removed existing {file_path[:-4]}")
+    
+    # Decompress the file
+    with open(file_path, 'rb') as file:
+        data = bz2.decompress(file.read())
+    with open(file_path[:-4], 'wb') as file:
+        file.write(data)
+    print(f"Decompressed {file_path}")
+
+# URLs of the files to download
+urls = {
+    'dlib_face_recognition_resnet_model_v1.dat': 'http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2',
+    'shape_predictor_68_face_landmarks.dat': 'http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2'
 }
 
-def download_file(filename, file_id):
-    url = f'https://drive.google.com/uc?export=download&id={file_id}'
-    response = requests.get(url, stream=True)
-    if response.status_code == 200:
-        with open(filename, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                f.write(chunk)
-        print(f"Downloaded and saved {filename}")
-    else:
-        print(f"Failed to download {filename}. Status code: {response.status_code}")
-
-def check_and_replace_files(file_ids):
-    for filename, file_id in file_ids.items():
-        if os.path.exists(filename):
-            print(f"{filename} exists. Replacing...")
-            download_file(filename, file_id)
-        else:
-            print(f"{filename} does not exist. Downloading...")
-            download_file(filename, file_id)
-
-if __name__ == "__main__":
-    check_and_replace_files(file_ids)
-
+for filename, url in urls.items():
+    download_file(url, filename)
+    decompress_bz2(filename + '.bz2')
