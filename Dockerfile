@@ -7,7 +7,8 @@ WORKDIR /app
 COPY . /app
 
 # Install system dependencies
-RUN apt-get update && \
+RUN ls /app
+    apt-get update && \
     apt-get install -y \
     cmake \
     libboost-all-dev \
