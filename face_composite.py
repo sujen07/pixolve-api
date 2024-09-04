@@ -4,12 +4,11 @@ import dlib
 from skimage.exposure import match_histograms
 import os
 
-shape_filepath = os.getenv('SHAPE_PREDICTOR_FILEPATH')
 
 
 # Load the face detector and the landmark predictor
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(shape_filepath)
+predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 def get_landmarks(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

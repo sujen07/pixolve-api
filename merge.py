@@ -8,10 +8,9 @@ import numpy as np
 import face_composite
 import os
 
-face_filepath = os.getenv('FACE_RECOGNITION_FILEPATH')
 
 detector = dlib.get_frontal_face_detector()
-recognizer = dlib.face_recognition_model_v1(face_filepath)
+recognizer = dlib.face_recognition_model_v1("dlib_face_recognition_resnet_model_v1.dat")
 face_distance_threshold = 0.6
 
 

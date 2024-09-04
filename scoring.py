@@ -5,11 +5,10 @@ import numpy as np
 #import matplotlib.pyplot as plt
 import os
 
-shape_filepath = os.getenv('SHAPE_PREDICTOR_FILEPATH')
 
 # Eye Aspect Ratio calculation
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(shape_filepath)
+predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 # Constant
 COEF_MAPPING = {'eyes_score': 0.5,
