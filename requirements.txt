@@ -10,4 +10,4 @@ scikit-learn
 opencv-python
 dlib
 scikit-image
-matplotlib
+requirements
