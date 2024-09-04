@@ -3,11 +3,13 @@ import dlib
 from scipy.spatial import distance
 import numpy as np
 #import matplotlib.pyplot as plt
-#import pdb
+import os
+
+shape_filepath = os.getenv('SHAPE_PREDICTOR_FILEPATH')
 
 # Eye Aspect Ratio calculation
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+predictor = dlib.shape_predictor(shape_filepath)
 
 # Constant
 COEF_MAPPING = {'eyes_score': 0.5,

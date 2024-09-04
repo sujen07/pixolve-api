@@ -27,5 +27,7 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 # Set environment variable for OpenCV
 ENV OPENCV_VIDEOIO_PRIORITY_MSMF=0
 
+RUN python /app/get_models.py
+
 # Command to run the application (replace with your actual command)
 CMD ["fastapi", "run", "/app/app.py", "--port", "8000"]

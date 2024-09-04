@@ -182,7 +182,7 @@ async def cluster_post(
         
         
         final_image = merge.main(temp_dir)
-        if not final_image:
+        if not isinstance(final_image, np.ndarray):
             raise HTTPException(status_code=500, detail="Images are not similar enough to merge!")
 
         output_image = image_to_bytes(final_image)
