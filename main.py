@@ -17,6 +17,7 @@ import scoring
 import time
 import merge
 from rate_limiter import rate_limiter
+import uvicorn
 
 
 load_dotenv()
@@ -26,7 +27,7 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "https://testing.pixolve.app",
-    "https://pixolve.app",
+    "https://www.pixolve.app",
 ]
 
 app.add_middleware(
@@ -201,3 +202,6 @@ async def cluster_post(
             for name in dirs:
                 os.rmdir(os.path.join(root, name))
         os.rmdir(temp_dir)
+
+if __name__ == "__main__":
+   uvicorn.run(app, host="0.0.0.0", port=8000)
