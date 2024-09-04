@@ -11,3 +11,4 @@ opencv-python
 dlib
 scikit-image
 requests
+fastapi[standard]
