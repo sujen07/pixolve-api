@@ -8,5 +8,6 @@ python-jose
 python-dotenv
 scikit-learn
 opencv-python
-dlib
+dlib==19.22.0
 scikit-image
+matplotlib
