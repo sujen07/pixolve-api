@@ -3,18 +3,12 @@
   "builds": [
     {
       "src": "app.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "buildCommand": "apt-get update && apt-get install -y cmake && pip install -r requirements.txt"
+      }
     }
   ],
-  "build": {
-    "env": {
-      "CMAKE_GENERATOR": "Unix Makefiles"
-    },
-    "commands": [
-      "apt-get update && apt-get install -y cmake",
-      "pip install -r requirements.txt"
-    ]
-  },
   "routes": [
     {
       "src": "/(.*)",
