@@ -10,5 +10,3 @@ scikit-learn
 opencv-python
 dlib
 scikit-image
-fastapi[standard]
-matplotlib

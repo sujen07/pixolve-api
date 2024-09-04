@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import dlib
 from skimage.exposure import match_histograms
-import matplotlib.pyplot as plt
 import pdb
 
 # Load the face detector and the landmark predictor
@@ -35,19 +34,6 @@ def calculate_feature_center(landmarks, feature_indices):
     center_x = int(np.mean(x_coords))
     center_y = int(np.mean(y_coords))
     return (center_x, center_y)
-
-def debug_display(images, titles, figsize=(15, 10)):
-    plt.figure(figsize=figsize)
-    for i, (image, title) in enumerate(zip(images, titles)):
-        if image.dtype != np.uint8:  # Convert to 8-bit if necessary
-            image = cv2.convertScaleAbs(image, alpha=(255.0/image.max()))
-        if len(image.shape) == 2:  # Grayscale image
-            plt.imshow(image, cmap='gray')
-        else:
-            plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-        plt.title(title)
-        plt.axis('off')
-        plt.show()
 
 
 
@@ -143,12 +129,6 @@ def merge_faces(source_image, target_image_full, face_location, debug=False):
         # Calculate the center of the feature for seamless cloning
         feature_center = calculate_feature_center(target_landmarks, all_features)
         center = (feature_center[0] + left, feature_center[1] + top)
-
-        if debug:
-            debug_display(
-                [source_feature, target_feature, aligned_feature, aligned_feature_masked, target_feature_masked, corrected_feature_masked, corrected_feature, scaled_mask],
-                ['Source Feature', 'Target Feature', 'Aligned Feature', 'Aligned Feature Masked', 'Target Feature Masked', 'Corrected Feature Masked', 'Final Corrected Feature', 'Scaled Mask']
-            )
 
         # Blend images using seamless cloning
         target_image_full = cv2.seamlessClone(corrected_feature, target_image_full, scaled_mask, center, cv2.NORMAL_CLONE)
