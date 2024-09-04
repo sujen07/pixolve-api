@@ -43,6 +43,7 @@ urls = {
     'resnet50.onnx': raw_url
 }
 
+
 for filename, url in urls.items():
     download_file(url, filename)
     if filename.endswith('.bz2'):
