@@ -7,7 +7,7 @@ WORKDIR /app
 COPY . /app
 
 # Install system dependencies
-RUN ls /app
+RUN ls 
     apt-get update && \
     apt-get install -y \
     cmake \
