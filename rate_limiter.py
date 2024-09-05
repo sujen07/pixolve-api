@@ -6,7 +6,7 @@ class RateLimiter:
     def __init__(self):
         self.user_calls: Dict[str, Dict[str, int]] = {}
 
-    def check_rate_limit(self, user_id: str, max_calls: int = 30):
+    def check_rate_limit(self, user_id: str, max_calls: int = 2):
         today = datetime.now().date()
         if user_id not in self.user_calls:
             self.user_calls[user_id] = {str(today): 1}
