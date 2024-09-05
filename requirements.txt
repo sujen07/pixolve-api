@@ -8,7 +8,7 @@ python-jose
 python-dotenv
 scikit-learn
 opencv-python
-cmake
-dlib==19.24.2
+dlib
 scikit-image
 requests
+fastapi[standard]
