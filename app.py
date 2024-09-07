@@ -16,7 +16,6 @@ import cluster
 import scoring
 import time
 import merge
-from rate_limiter import rate_limiter
 
 
 load_dotenv()
@@ -25,8 +24,6 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
-    "https://testing.pixolve.app",
-    "https://www.pixolve.app",
 ]
 
 app.add_middleware(
@@ -42,13 +39,13 @@ security = HTTPBearer()
 
 CLERK_JWT_PUBLIC_KEY = """
 -----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA34FvFwT6JAsy0aNLAMm8
-IoZtC7HfrRLer7psvQS6+GoZ1xE/ElZacGX8Vjd5PcrknCXI8nNneD6QwiSr1et9
-/VuKMPPoIiwKM22wqXmfn6CnqpdpUAx8ObBR7xTf+MbsSZb/AQoty2C2hww4Ivfa
-tTLJivZVsUiH/TVu7024x40Qt8GGyyptg9jIUOFRonvy3qx95av/zZwipAZ8H53y
-GgPUQAxcKfplQaro6jps5pFB/CzoAWdl+lzAqTxS35kY3zT55iYPG9V8j8YdS4+b
-YRgpwf00KS1cnYNiKx+g8D3bWX3lJrCekwDsClZ+aLsfsSAkKIEUx2zzS0xCMkOO
-SQIDAQAB
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw1Z2+EdvvKSei8hD1y5X
+rmaXD2+udtdK9JrGveW4g0Qn0C3Qw7b8Co0elHnj2HG/MnMzLJiOIrgSxoZnZtpS
+B5rEEJwZCx6p6NeDVtJsPACtTe01L6KPYpFAn0RaBe+gBdPHbAzpxUj8eEtwIWWz
+wYiTU3HlSHAFt8hii1Yn42pzuXWM+QYmF/8PzEinkVWrmrZY3usus0asqIv/EtH0
+aZUxt6Yhi3us1F5DsY0ZAerxC40tpkGPpPTsoNdpRcVlw51BDFJX+7t528GSgBse
+PYGP6Ewvu2G9Z/Wwk96U2sIW+k2K+E3i0xmnaSA7wKpmJN6+EPZkYlNNAS2/v2ds
+pQIDAQAB
 -----END PUBLIC KEY-----
 """
 
@@ -96,21 +93,10 @@ def verify_jwt(credentials: HTTPAuthorizationCredentials = Depends(security)) ->
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-def rate_limit(payload: Dict = Depends(verify_jwt)):
-    user_id = payload.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=400, detail="User ID not found in token")
-    rate_limiter.check_rate_limit(user_id)
-    return payload
-
-@app.get("/")
-def read_root():
-   return {"Welcome to": "My first FastAPI depolyment using Docker image"}
-
 @app.post("/enhance")
 async def predict(
     file: UploadFile = File(...),
-    payload: Dict = Depends(rate_limit)
+    payload: Dict = Depends(verify_jwt)
 ):
     try:        
         img = Image.open(file.file).convert('RGB')
@@ -132,7 +118,7 @@ async def predict(
 @app.post("/cluster")
 async def cluster_post(
     file: UploadFile = File(...),
-    payload: Dict = Depends(rate_limit)
+    payload: Dict = Depends(verify_jwt)
 ):
     
     file_content = await file.read()
@@ -169,7 +155,7 @@ async def cluster_post(
 @app.post("/merge")
 async def cluster_post(
     file: UploadFile = File(...),
-    payload: Dict = Depends(rate_limit)
+    payload: Dict = Depends(verify_jwt)
 ):
     
     file_content = await file.read()
