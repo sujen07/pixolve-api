@@ -1,9 +1,9 @@
 <br/>
 <p align="center">
-  <h3 align="center">Pixolve UI</h3>
+  <h3 align="center">Pixolve API</h3>
 
   <p align="center">
-    UI for Pixolve AI Image APIs
+    API for Pixolve Website
     <br/>
     <br/>
   </p>
