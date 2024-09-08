@@ -1,49 +1,70 @@
-# Documentation
+<br/>
+<p align="center">
+  <h3 align="center">Pixolve UI</h3>
 
-## Pulling Repo
+  <p align="center">
+    UI for Pixolve AI Image APIs
+    <br/>
+    <br/>
+  </p>
+</p>
 
-1. Install git lfs for large files
+## Table Of Contents
 
-```bash
-brew install git-lfs
+* [About the Project](#about-the-project)
+* [Built With](#built-with)
+* [Getting Started](#getting-started)
+  * [Prerequisites](#prerequisites)
+  * [Installation](#installation)
+* [Usage](#usage)
+* [Authors](#authors)
+
+## About The Project
+Please visit the Frontend github on information to install and run frontend website locally:
+[Pixolve Web](https://github.com/sohankancherla/pixolve-web)
+
+
+
+## Getting Started
+
+To run the backend api folllow these steps:
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+
+### Installation
+
+1. Fork and clone the repo
+
+2. Navigate to the project directory
+
+```sh
+cd pixolve-api
+```
+3. Open Docker Engine and have it running
+
+4. Build the docker file as a container
+
+```sh
+docker build -t pixove-backend
 ```
 
-2. Add lfs to git
 
-```bash
-git lfs install
-```
+## Usage
 
-3. Pull lfs
+After you have installed all prerequisites and set up the project, follow these steps to run the application:
 
-```bash
-git lfs pull
-```
-
-## Local
-
-1. Install Packages
-
-```bash
-pip3 install -r requirements.txt
-```
-
-2. Run Development Server
-
-```bash
-fastapi dev app.py
-```
-
-## Docker
-
-Build Image
-
-```bash
-docker build -t pixolve-backend .
-```
-
-Run Docker Container
-
-```bash
+1. Run the Docker to start API server
+```sh
 docker run -p 8000:8000 pixolve-backend
 ```
+2. Follow frontend instructions to run the website
+
+## Authors
+
+* **Sujen Kancherla** - *Machine Learning Student* - [Sujen Kancherla](https://github.com/sujen07) - *Developer*
+
+
+
